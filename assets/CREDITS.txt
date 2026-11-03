@@ -1,0 +1,6 @@
+gems.png
+"Rotating Gems for Match3" by Bondoki
+License: CC0 (public domain)
+Source: https://opengameart.org/node/125192
+Sheet layout: 40 frames x 24 rows, 52x52 px per tile.
+Rows: 7 colors x 3 (gem, heart, arc), then 3 rainbow rows (star, heart, arc).

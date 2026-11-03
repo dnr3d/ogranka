@@ -5,113 +5,122 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Unbounded:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&display=swap">
 <style>
-/* Layout: one phone screen, a jeweller's tray. HUD on top, the board fills what is left, legend below. */
+/* Layout: one phone screen built around the hand-drawn board. Level, moves and tools sit beside the
+   clip, goals sit on the pink bar. --k converts board.png pixels into CSS pixels. */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: #190c10;
-  --velvet: #241318;
-  --velvet-deep: #190c10;
-  --cell-a: #35202a;
-  --cell-b: #2c1921;
-  --brass: #d9ae62;
-  --brass-dim: #7d6038;
-  --paper: #f5e8d3;
-  --muted: #bda493;
-  --warn: #ff9271;
-  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
-  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #fdf3f4;
+  --paper: #fdf3f4;
+  --ink: #1c0a10;
+  --pink: #ddb8c0;
+  --pink-deep: #a84f6c;
+  --muted: #6d5a61;
+  --font: "Balsamiq Sans", "Comic Sans MS", system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
   margin: 0; overflow: hidden; overscroll-behavior: none;
-  background: radial-gradient(120% 80% at 50% 45%, var(--velvet) 0%, var(--velvet-deep) 100%), var(--velvet-deep);
-  color: var(--paper); font-family: var(--font-body); font-size: 14px;
+  background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 14px;
   -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
 }
 #app {
   height: 100%; max-width: 520px; margin: 0 auto;
   display: flex; flex-direction: column; gap: 10px;
-  padding-block: 10px;
+  padding-block: 8px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-.eyebrow { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-
-#top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
-#lvl { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-#levelLabel { font: 700 14px/1.2 var(--font-display); white-space: nowrap; }
-#movesBox { display: flex; flex-direction: column; align-items: center; min-width: 76px; }
-#moves { font: 700 34px/1 var(--font-display); color: var(--brass); font-variant-numeric: tabular-nums; }
-#moves.low { color: var(--warn); }
-#tools { display: flex; justify-content: flex-end; gap: 6px; }
+#stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+#tray {
+  --k: .3; position: relative; flex: none;
+  width: calc(1080px * var(--k)); height: calc(1350px * var(--k));
+  background: url("assets/board.png") no-repeat 0 calc(-50px * var(--k)) / calc(1080px * var(--k)) auto;
+}
+#top {
+  position: absolute; top: 0; left: 15%; right: 0; height: calc(190px * var(--k));
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+}
+#levelLabel { font-weight: 700; font-size: 15px; line-height: 1.1; white-space: nowrap; }
+#movesBox { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+#moves { font-weight: 700; font-size: 26px; font-variant-numeric: tabular-nums; }
+#moves.low { color: var(--pink-deep); }
+.label { font-size: 11px; letter-spacing: .04em; color: var(--muted); }
+#tools { display: flex; gap: 4px; }
 .icon {
   width: 44px; height: 44px; display: grid; place-items: center; padding: 0;
-  background: transparent; color: var(--muted); border: 1px solid var(--brass-dim); border-radius: 50%; cursor: pointer;
+  background: transparent; color: var(--ink); border: 2px solid var(--ink); border-radius: 50%; cursor: pointer;
 }
-.icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.icon:focus-visible, .cta:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon:focus-visible, .cta:focus-visible { outline: 3px solid var(--pink-deep); outline-offset: 2px; }
 .icon[aria-pressed="false"] .wave { display: none; }
 
-#goals { display: flex; justify-content: center; gap: 8px; min-height: 44px; }
-.goal {
-  display: flex; align-items: center; gap: 4px; padding: 3px 12px 3px 5px;
-  border: 1px solid var(--brass-dim); border-radius: 999px; background: var(--velvet-deep);
+#goals {
+  position: absolute; top: calc(190px * var(--k)); left: calc(70px * var(--k)); right: calc(22px * var(--k)); height: calc(125px * var(--k));
+  display: flex; align-items: center; justify-content: center; gap: 12px;
 }
-.goal b { font: 700 15px/1 var(--font-display); font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
-.goal.done { border-color: var(--brass); }
-.goal.done b { color: var(--brass); }
+.goal { display: flex; align-items: center; gap: 4px; }
+.goal b { font-weight: 700; font-size: 18px; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2ch; }
+.goal.done b { color: var(--pink-deep); }
 .goal.pop { animation: pop .22s ease-out; }
-@keyframes pop { 50% { transform: scale(1.14); } }
-.sprite { background-image: url("assets/gems.png"); background-repeat: no-repeat; flex: none; }
-.sprite.off { filter: grayscale(1) brightness(.45); }
+@keyframes pop { 50% { transform: scale(1.18); } }
+.pic { display: block; flex: none; object-fit: contain; }
 
-#scoreRow { display: flex; align-items: center; gap: 10px; }
-#score { font: 500 13px/1 var(--font-display); font-variant-numeric: tabular-nums; min-width: 4ch; }
-#bar { position: relative; flex: 1; height: 6px; border-radius: 3px; background: var(--velvet-deep); box-shadow: inset 0 0 0 1px var(--brass-dim); }
-#fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 3px; background: var(--brass); transition: width .3s ease-out; }
-.tick { position: absolute; top: -3px; width: 2px; height: 12px; background: var(--paper); opacity: .75; }
+#board {
+  position: absolute; display: block;
+  left: calc(47px * var(--k)); top: calc(331px * var(--k));
+  touch-action: none; cursor: pointer;
+}
 
-#stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
-#board { display: block; border-radius: 10px; box-shadow: 0 0 0 1px var(--brass-dim), 0 0 0 5px var(--velvet-deep), 0 0 0 6px var(--brass-dim); touch-action: none; cursor: pointer; }
+#scoreRow { display: flex; align-items: center; gap: 8px; }
+#score { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; min-width: 4ch; }
+#bar { position: relative; flex: 1; height: 10px; border-radius: 5px; background: #fff; box-shadow: inset 0 0 0 2px var(--ink); overflow: hidden; }
+#fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--pink-deep); transition: width .3s ease-out; }
+.tick { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--ink); }
 
-#legend { display: flex; justify-content: space-between; gap: 6px; padding-top: 4px; }
-.leg { flex: 1; display: flex; align-items: center; gap: 2px; font-size: 11px; line-height: 1.2; color: var(--muted); min-width: 0; }
+#legend { display: flex; justify-content: space-between; gap: 6px; }
+.leg { flex: 1; display: flex; align-items: center; gap: 3px; font-size: 12px; line-height: 1.15; color: var(--muted); min-width: 0; }
+.leg canvas { flex: none; }
 
 .flyer { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 5; }
 
-#result { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: rgba(25, 12, 16, .78); }
+#result { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: rgba(28, 10, 16, .45); }
 #card {
   width: min(340px, 100%); padding: 24px 20px; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center;
-  background: var(--velvet); border: 1px solid var(--brass); border-radius: 16px;
+  background: var(--paper); border: 3px solid var(--ink); border-radius: 6px;
 }
-#card h2 { margin: 0; font: 700 22px/1.2 var(--font-display); text-wrap: balance; }
-#card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.4; }
+#card h2 { margin: 0; font-weight: 700; font-size: 24px; line-height: 1.2; text-wrap: balance; }
+#card p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.4; }
 #stars { display: flex; gap: 4px; }
-#left { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#stars svg { width: 60px; height: 60px; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+#left { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .cta {
-  width: 100%; min-height: 50px; border: 0; border-radius: 12px; cursor: pointer;
-  background: var(--brass); color: var(--velvet-deep); font: 700 14px/1 var(--font-display);
+  width: 100%; min-height: 50px; border: 3px solid var(--ink); border-radius: 6px; cursor: pointer;
+  background: var(--pink); color: var(--ink); font: 700 17px/1 var(--font);
 }
 </style>
 
 <div id="app">
-  <header id="top">
-    <div id="lvl"><span class="eyebrow">Огранка</span><span id="levelLabel">Уровень 1</span></div>
-    <div id="movesBox"><span id="moves">20</span><span class="eyebrow">ходы</span></div>
-    <div id="tools">
-      <button class="icon" id="btnSound" aria-label="Звук" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l5 4V6L7 10z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>
-      <button class="icon" id="btnRestart" aria-label="Начать уровень заново"><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M5 4v4h4"/></svg></button>
+  <main id="stage">
+    <div id="tray">
+      <header id="top">
+        <span id="levelLabel">Уровень 1</span>
+        <div id="movesBox"><span id="moves">20</span><span class="label">ходы</span></div>
+        <div id="tools">
+          <button class="icon" id="btnSound" aria-label="Звук" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l5 4V6L7 10z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>
+          <button class="icon" id="btnRestart" aria-label="Начать уровень заново"><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M5 4v4h4"/></svg></button>
+        </div>
+      </header>
+      <div id="goals" aria-label="Цели уровня"></div>
+      <canvas id="board" aria-label="Игровое поле 7 на 7"></canvas>
     </div>
-  </header>
-  <div id="goals" aria-label="Цели уровня"></div>
-  <div id="scoreRow"><span class="eyebrow">Караты</span><span id="score">0</span><div id="bar"><div id="fill"></div><i class="tick" id="tick2"></i></div></div>
-  <main id="stage"><canvas id="board" aria-label="Игровое поле 8 на 8"></canvas></main>
+  </main>
+  <div id="scoreRow"><span class="label">Очки</span><span id="score">0</span><div id="bar"><div id="fill"></div><i class="tick" id="tick2"></i></div></div>
   <footer id="legend"></footer>
 </div>
 <div id="result" hidden>
@@ -127,34 +136,32 @@ body {
 <script>
 'use strict';
 /* ---------- Data ---------- */
-const SIZE = 8, FRAMES = 40, TILE = 52, STAR_ROW = 21;
-// Sheet rows: each color takes 3 rows in order gem, heart (bomb), arc (line).
+const SIZE = 7; // matches the grid drawn in board.png
+const BOARD_PX = 994; // grid side in board.png, the tray CSS positions the canvas over it
 const COLORS = [
-  { name: 'Рубины',   row: 12, hex: '#ff5a3c' },
-  { name: 'Сапфиры',  row: 0,  hex: '#5a97ff' },
-  { name: 'Изумруды', row: 3,  hex: '#35de5c' },
-  { name: 'Цитрины',  row: 18, hex: '#ecdc30' },
-  { name: 'Аметисты', row: 9,  hex: '#bd4cf5' },
-  { name: 'Алмазы',   row: 15, hex: '#dff2fb' },
+  { name: 'Коты',     file: 'cat',    hex: '#f0a030' },
+  { name: 'Вороны',   file: 'crow',   hex: '#3a2f4d' },
+  { name: 'Лягушки',  file: 'frog',   hex: '#86a832' },
+  { name: 'Кролики',  file: 'rabbit', hex: '#f4b6a6' },
+  { name: 'Носороги', file: 'rhino',  hex: '#a58a5f' },
 ];
-const KIND_OFFSET = { gem: 0, bomb: 1, line: 2 };
 const NOTES = [523, 587, 659, 784, 880, 1047, 1175, 1319];
 
 function levelConfig(n) {
-  const nColors = n <= 3 ? 5 : 6;
+  const nColors = COLORS.length;
   const kinds = n === 1 ? 1 : n <= 3 ? 2 : 3;
   const perGoal = Math.min(26, 10 + n * 2);
-  const moves = Math.min(24, 8 + kinds * 4 + Math.floor(n / 4));
+  const moves = Math.min(20, 10 + kinds * 2 + Math.floor(n / 4));
   const goals = {};
   for (let i = 0; i < kinds; i++) goals[(n - 1 + i * 2) % nColors] = perGoal;
-  return { nColors, goals, moves, star2: moves * 85, star3: moves * 125 };
+  return { nColors, goals, moves, star2: moves * 110, star3: moves * 160 };
 }
 
 /* ---------- State ---------- */
 const $ = id => document.getElementById(id);
 const canvas = $('board'), ctx = canvas.getContext('2d');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const sheet = new Image(); sheet.src = 'assets/gems.png';
+const SPRITES = COLORS.map(c => { const im = new Image(); im.src = `assets/${c.file}.png`; return im; });
 let SPEED = reduced ? .4 : 1;
 let grid = [], S = {}, busy = false, restartPending = false, nextId = 1;
 let cell = 40, dpr = 1, now = performance.now();
@@ -570,13 +577,15 @@ function start(level) {
 }
 
 /* ---------- HUD ---------- */
-function spriteHtml(row, size, off) {
-  const s = size;
-  return `<span class="sprite${off ? ' off' : ''}" style="display:block;width:${s}px;height:${s}px;background-size:${FRAMES * s}px ${24 * s}px;background-position:0 ${-row * s}px"></span>`;
+function spriteHtml(color, size) {
+  return `<img class="pic" src="${SPRITES[color].src}" width="${size}" height="${size}" alt="" draggable="false">`;
+}
+function starSvg(on) {
+  return `<svg viewBox="0 0 24 24" fill="${on ? '#ffd34d' : '#e6dcde'}" aria-hidden="true"><path d="M12 2l3 6.6 7 .8-5.200 4.800 1.500 7L12 17.600 5.700 21.200l1.500-7L2 9.400l7-.8z"/></svg>`;
 }
 function buildGoals() {
   $('goals').innerHTML = Object.keys(S.goals).map(c =>
-    `<div class="goal" id="goal${c}" aria-label="${COLORS[c].name}">${spriteHtml(COLORS[c].row, 36)}<b></b></div>`).join('');
+    `<div class="goal" id="goal${c}" aria-label="${COLORS[c].name}">${spriteHtml(c, 30)}<b></b></div>`).join('');
 }
 function renderHud(popped = []) {
   $('moves').textContent = S.moves;
@@ -595,25 +604,25 @@ function fly(color, c, r) {
   const target = $('goal' + color);
   if (!target) return;
   const box = canvas.getBoundingClientRect(), to = target.getBoundingClientRect();
-  const size = 36;
+  const size = 30;
   const x0 = box.left + (c + .5) * cell - size / 2, y0 = box.top + (r + .5) * cell - size / 2;
   const el = document.createElement('div');
   el.className = 'flyer';
-  el.innerHTML = spriteHtml(COLORS[color].row, size);
+  el.innerHTML = spriteHtml(color, size);
   document.body.appendChild(el);
   el.animate([
-    { transform: `translate(${x0}px,${y0}px) scale(1)` },
-    { transform: `translate(${to.left + 5}px,${to.top + 3}px) scale(.8)` },
+    { transform: `translate(${x0}px,${y0}px) scale(1.3)` },
+    { transform: `translate(${to.left}px,${to.top}px) scale(1)` },
   ], { duration: 460, easing: 'cubic-bezier(.5,0,.3,1)' }).finished.finally(() => el.remove());
 }
 function showResult(won) {
   const { cfg, score, level } = S;
   const stars = !won ? 0 : score >= cfg.star3 ? 3 : score >= cfg.star2 ? 2 : 1;
   $('resTitle').textContent = won ? `Уровень ${level} пройден` : 'Ходы закончились';
-  $('stars').innerHTML = won ? [1, 2, 3].map(i => spriteHtml(STAR_ROW, 64, i > stars)).join('') : '';
+  $('stars').innerHTML = won ? [1, 2, 3].map(i => starSvg(i <= stars)).join('') : '';
   $('left').innerHTML = won ? '' : Object.keys(S.goals).filter(c => S.goals[c] > 0).map(c =>
-    `<div class="goal">${spriteHtml(COLORS[c].row, 36)}<b>${S.goals[c]}</b></div>`).join('');
-  $('resText').textContent = won ? `Набрано карат: ${score}` : 'Осталось собрать эти камни.';
+    `<div class="goal">${spriteHtml(c, 44)}<b>${S.goals[c]}</b></div>`).join('');
+  $('resText').textContent = won ? `Набрано очков: ${score}` : 'Осталось собрать этих зверей.';
   $('resBtn').textContent = won ? 'Следующий уровень' : 'Сыграть ещё раз';
   $('resBtn').onclick = () => start(won ? level + 1 : level);
   $('result').hidden = false;
@@ -624,7 +633,7 @@ function showResult(won) {
 function addFx(fx, delay) { fx.t0 = now + delay * SPEED; fx.life = 300; if (SPEED) fxList.push(fx); }
 function burst(c, r, color) {
   if (reduced || SPEED === 0 || particles.length > 220) return;
-  const hex = color >= 0 ? COLORS[color].hex : '#f5e8d3';
+  const hex = color >= 0 ? COLORS[color].hex : '#ffd34d';
   for (let i = 0; i < 7; i++) {
     const a = Math.random() * 6.283, v = 2 + Math.random() * 4;
     particles.push({ x: c + .5, y: r + .5, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, hex, s: .05 + Math.random() * .07 });
@@ -632,30 +641,66 @@ function burst(c, r, color) {
 }
 
 /* ---------- Render ---------- */
-function frameOf(g) {
-  if (g === selected) return Math.floor(now / 30) % FRAMES;
-  if (hint && (g === hint[0] || g === hint[1])) return (Math.round(9 * Math.sin(now / 170)) + FRAMES) % FRAMES;
-  if (g.kind !== 'gem' && !reduced) return (Math.round(5 * Math.sin(now / 380 + g.id)) + FRAMES) % FRAMES;
-  if (!busy && !reduced) {
-    const d = (now - waveStart - (g.x + g.y) * 60) / 560;
-    if (d > 0 && d < 1) return Math.floor(d * FRAMES) % FRAMES;
+function spikes(c, n, outer, inner) {
+  c.beginPath();
+  for (let i = 0; i < n * 2; i++) {
+    const r = i % 2 ? inner : outer, a = -Math.PI / 2 + i * Math.PI / n;
+    c.lineTo(Math.cos(a) * r, Math.sin(a) * r);
   }
-  return 0;
+  c.closePath();
 }
-function rowOf(g) { return g.kind === 'star' ? STAR_ROW : COLORS[g.color].row + KIND_OFFSET[g.kind]; }
+// Draws one piece centered on the origin. Specials have no art yet, so they are drawn in code:
+// line is the animal on a pink cross, bomb is the animal on a yellow burst, star is a star.
+function drawPiece(c, kind, color, size) {
+  c.lineJoin = 'round'; c.lineCap = 'round';
+  c.strokeStyle = '#1c0a10';
+  if (kind === 'star') {
+    const g = c.createLinearGradient(-size / 2, -size / 2, size / 2, size / 2);
+    ['#f0a030', '#f4b6a6', '#e8799a', '#7fb0d8', '#86a832'].forEach((h, i) => g.addColorStop(i / 4, h));
+    spikes(c, 5, size * .52, size * .24);
+    c.fillStyle = g; c.fill();
+    c.lineWidth = Math.max(1.5, size * .045); c.stroke();
+    return;
+  }
+  if (kind === 'line') {
+    const arm = size * .42;
+    for (const [w, h] of [[size * .3, '#1c0a10'], [size * .22, '#e8799a']]) {
+      c.lineWidth = w; c.strokeStyle = h;
+      c.beginPath(); c.moveTo(-arm, 0); c.lineTo(arm, 0); c.moveTo(0, -arm); c.lineTo(0, arm); c.stroke();
+    }
+  } else if (kind === 'bomb') {
+    spikes(c, 10, size * .52, size * .36);
+    c.fillStyle = '#ffd34d'; c.fill();
+    c.strokeStyle = '#1c0a10'; c.lineWidth = Math.max(1.5, size * .04); c.stroke();
+  }
+  const s = size * (kind === 'gem' ? 1 : .72), im = SPRITES[color];
+  if (im.complete && im.naturalWidth) {
+    const w = s * im.naturalWidth / im.naturalHeight;
+    c.drawImage(im, -w / 2, -s / 2, w, s);
+  } else {
+    c.fillStyle = COLORS[color].hex;
+    c.beginPath(); c.arc(0, 0, s * .4, 0, 6.283); c.fill();
+  }
+}
 
 function drawGem(g) {
-  let sc = g.sc;
-  if (hint && (g === hint[0] || g === hint[1])) sc *= 1 + .07 * Math.sin(now / 130);
-  const size = cell * 1.12 * sc, px = (g.x + .5) * cell, py = (g.y + .5) * cell;
-  ctx.globalAlpha = g.a;
-  if (sheet.complete && sheet.naturalWidth) {
-    ctx.drawImage(sheet, frameOf(g) * TILE, rowOf(g) * TILE, TILE, TILE, px - size / 2, py - size / 2, size, size);
-  } else {
-    ctx.fillStyle = g.color >= 0 ? COLORS[g.color].hex : '#fff';
-    ctx.beginPath(); ctx.arc(px, py, size * .32, 0, 6.283); ctx.fill();
+  let sc = g.sc, rot = 0, hop = 0;
+  if (g === selected) { rot = .16 * Math.sin(now / 80); sc *= 1.08; }
+  else if (hint && (g === hint[0] || g === hint[1])) { rot = .12 * Math.sin(now / 120); sc *= 1 + .07 * Math.sin(now / 130); }
+  else if (!reduced) {
+    if (g.kind !== 'gem') rot = .07 * Math.sin(now / 380 + g.id);
+    else if (!busy) {
+      const d = (now - waveStart - (g.x + g.y) * 60) / 420;
+      if (d > 0 && d < 1) hop = Math.sin(d * Math.PI) * .12;
+    }
   }
-  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.globalAlpha = g.a;
+  ctx.translate((g.x + .5) * cell, (g.y + .5 - hop) * cell);
+  ctx.rotate(rot);
+  ctx.scale(sc, sc);
+  drawPiece(ctx, g.kind, g.color, cell);
+  ctx.restore();
 }
 
 function render(dt) {
@@ -664,13 +709,9 @@ function render(dt) {
   ctx.clearRect(0, 0, w, w);
   ctx.save();
   if (shake > .3) { ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake); shake *= .86; }
-  for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) {
-    ctx.fillStyle = (r + c) % 2 ? '#2c1921' : '#35202a';
-    ctx.fillRect(c * cell, r * cell, cell + .5, cell + .5);
-  }
   if (selected) {
-    ctx.strokeStyle = '#d9ae62'; ctx.lineWidth = 2;
-    ctx.strokeRect(selected.x * cell + 2, selected.y * cell + 2, cell - 4, cell - 4);
+    ctx.fillStyle = 'rgba(255,255,255,.45)';
+    ctx.fillRect(selected.x * cell, selected.y * cell, cell, cell);
   }
   ctx.save();
   ctx.beginPath(); ctx.rect(0, 0, SIZE * cell, SIZE * cell); ctx.clip();
@@ -684,7 +725,6 @@ function render(dt) {
 
 function drawFx() {
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
   fxList = fxList.filter(f => now < f.t0 + f.life);
   for (const f of fxList) {
     const t = (now - f.t0) / f.life;
@@ -692,16 +732,16 @@ function drawFx() {
     const a = 1 - t, full = SIZE * cell;
     if (f.type === 'beam') {
       const half = f.width === 3 ? 1.5 : .5, th = cell * half * 2 * (1 - t * .7);
-      ctx.fillStyle = `rgba(255,226,160,${.75 * a})`;
+      ctx.fillStyle = `rgba(255,240,245,${.85 * a})`;
       ctx.fillRect(0, (f.r + .5) * cell - th / 2, full, th);
       ctx.fillRect((f.c + .5) * cell - th / 2, 0, th, full);
     } else if (f.type === 'ring') {
-      ctx.strokeStyle = `rgba(255,214,150,${a})`;
+      ctx.strokeStyle = `rgba(255,211,77,${a})`;
       ctx.lineWidth = cell * .4 * a + 1;
       ctx.beginPath(); ctx.arc((f.c + .5) * cell, (f.r + .5) * cell, f.radius * cell * easeOut(t), 0, 6.283); ctx.stroke();
     } else {
-      ctx.strokeStyle = `rgba(255,240,210,${a})`;
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(255,255,255,${a})`;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       for (const k of f.targets) {
         const [r, c] = unkey(k);
@@ -730,12 +770,12 @@ function drawPopups() {
   for (const p of popups) {
     const t = (now - p.t0) / p.life;
     const size = p.big ? cell * .62 : cell * .42;
-    ctx.font = `700 ${size}px Unbounded, "Arial Black", sans-serif`;
+    ctx.font = `700 ${size}px "Balsamiq Sans", "Comic Sans MS", sans-serif`;
     ctx.globalAlpha = t < .7 ? 1 : (1 - t) / .3;
     const x = p.x * cell, y = (p.y + (p.big ? .5 : .5)) * cell - t * cell * (p.big ? .3 : .8);
-    ctx.lineWidth = size * .22; ctx.strokeStyle = '#190c10'; ctx.lineJoin = 'round';
+    ctx.lineWidth = size * .26; ctx.strokeStyle = '#fdf3f4'; ctx.lineJoin = 'round';
     ctx.strokeText(p.text, x, y);
-    ctx.fillStyle = p.big ? '#d9ae62' : '#f5e8d3';
+    ctx.fillStyle = p.big ? '#a84f6c' : '#1c0a10';
     ctx.fillText(p.text, x, y);
   }
   ctx.globalAlpha = 1;
@@ -764,9 +804,11 @@ function loop(ts) {
 
 function resize() {
   const box = $('stage').getBoundingClientRect();
-  // leave room for the tray's 6px outline so it stays inside the gutter
-  const css = Math.floor(Math.min(box.width, box.height) - 12);
-  if (css <= 0) return;
+  // tray shows board.png cropped to 1080x1350
+  const k = Math.min(box.width / 1080, box.height / 1350);
+  if (k <= 0) return;
+  $('tray').style.setProperty('--k', k);
+  const css = BOARD_PX * k;
   dpr = Math.min(3, window.devicePixelRatio || 1);
   cell = css / SIZE;
   canvas.style.width = canvas.style.height = css + 'px';
@@ -868,11 +910,29 @@ const sound = {
 };
 
 /* ---------- Boot ---------- */
-$('legend').innerHTML = [
-  [COLORS[0].row + 2, '4 в ряд: дуга бьёт крестом'],
-  [COLORS[1].row + 1, 'Уголок: сердце-бомба'],
-  [STAR_ROW, '5 в ряд: звезда цвета'],
-].map(([row, text]) => `<div class="leg">${spriteHtml(row, 32)}<span>${text}</span></div>`).join('');
+for (const [kind, color, text] of [
+  ['line', 0, '4 в ряд: крест'],
+  ['bomb', 2, 'Уголок: взрыв'],
+  ['star', 0, '5 в ряд: звезда'],
+]) {
+  const row = document.createElement('div');
+  row.className = 'leg';
+  const cv = document.createElement('canvas'), size = 34, d = 3;
+  cv.width = cv.height = size * d;
+  cv.style.width = cv.style.height = size + 'px';
+  const paint = () => {
+    const c = cv.getContext('2d');
+    c.setTransform(d, 0, 0, d, size * d / 2, size * d / 2);
+    c.clearRect(-size, -size, size * 2, size * 2);
+    drawPiece(c, kind, color, size * .94);
+  };
+  paint();
+  SPRITES[color].addEventListener('load', paint);
+  const label = document.createElement('span');
+  label.textContent = text;
+  row.append(cv, label);
+  $('legend').appendChild(row);
+}
 
 let savedLevel = 1;
 try {

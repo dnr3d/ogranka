@@ -823,7 +823,15 @@ try {
 } catch (e) {}
 new ResizeObserver(resize).observe($('stage'));
 
-const Match3 = { start, leave, levelConfig };
+const Match3 = {
+  start, leave, levelConfig,
+  stop() { active = false; cancelAnimationFrame(raf); tweens.clear(); busy = false; $('result').hidden = true; },
+  force(won) {
+    if (!active) return;
+    tweens.clear(); busy = false;
+    finish({ won, stars: won ? 3 : 0, score: S.score });
+  },
+};
 
 // Test hook for balance checks.
 window.__ogranka = {
